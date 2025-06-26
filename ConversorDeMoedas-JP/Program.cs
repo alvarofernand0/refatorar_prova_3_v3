@@ -1,163 +1,150 @@
-﻿using System;
+﻿using System.Runtime.ConstrainedExecution;
 using ConversorDeMoedas;
 
-List<Moeda> moedas = new List<Moeda>()
-{ // TODO fazer a mesma coisa com o conjunto vazio... portanto, deve verificar as suas implicações...
-    new Moeda() {Nome = "Dolar($)", Cotacao = 4.50m},
-    new Moeda() {Nome = "Euro(€)", Cotacao = 5.50m},
-    new Moeda() {Nome = "Iene(¥)", Cotacao = 0.567m},
-    new Moeda() {Nome = "Real Brasileiro(R$)", Cotacao = 1.00m},
-    new Moeda() {Nome = "Peseta(Pts)", Cotacao = 2.35m}
-};
+List<Moeda> moedas = new List<Moeda>();
 
-IniciarAplicacao();
+IniciarPrograma();
 
-void IniciarAplicacao()
+void IniciarPrograma()
 {
     bool sair = false;
-    /*
-    ! while(true, false)
-    ! if(true, false)
-    */
-    while (sair != true) // ! nao precisa verificar essa igualdade... !sair == negacao(false) == true
+    while (!sair)
     {
         Console.Clear();
-        Console.WriteLine("=== MENU DE MOEDAS ===\n");
-        Console.WriteLine("1 - Listar Moedas");
+        Console.WriteLine("### MENU DE MOEDAS ###\n");
+        Console.WriteLine("1- Listar Moedas");
         Console.WriteLine("2 - Adicionar Moedas");
         Console.WriteLine("3 - Converter Moedas");
         Console.WriteLine("4 - SAIR\n");
         Console.WriteLine("Digite uma das opções...");
 
-        int.TryParse(Console.ReadLine(), out int opcao); // ! nao está errado!!!!!! MASSSSS, rever o uso disso!
+        string opcao = Console.ReadLine();
+
         switch (opcao)
         {
-            case 1:
+            case "1":
                 ListarMoedas();
                 break;
-            case 2:
+            case "2":
                 AdicionarMoedas();
                 break;
-            case 3:
+            case "3":
                 ConverterMoedas();
                 break;
-            case 4:
+            case "4":
                 sair = true;
                 Console.Clear();
-                Console.WriteLine("Saindo da Aplicação...");
+                Console.WriteLine("Saindo da aplicação...");
                 break;
             default:
-                Console.WriteLine("Opção inválida!\n");
-                Console.WriteLine("Digite qualquer tecla para voltar ao menu...");
+                Console.WriteLine("Opção inválida!\nDigite qualquer tecla para retornar ao menu...");
                 break;
         }
-        Console.ReadKey();
+        Console.ReadLine();
     }
 }
 
 void ListarMoedas()
 {
     Console.Clear();
-    Console.WriteLine("=== MENU DE LISTAGEM ===\n");
+    Console.WriteLine("### LISTAGEM DE MOEDAS ###\n");
 
-    for (int i = 0; i < moedas.Count; i++)
+    if (moedas.Count == 0)
     {
-        Console.WriteLine("------------------\n");
-
-        Console.WriteLine($"{i + 1}- {moedas[i].Nome} {moedas[i].Cotacao}\n");
+        Console.WriteLine("Não há moedas Cadastradas!\n");
+        Console.WriteLine("Digite qualquer tecla para retornar ao Menu...");
     }
-    Console.WriteLine("------------------\n");
-    Console.WriteLine("Digite qualquer tecla para retornar ao menu...");
+    else
+    {
+        Console.WriteLine("---------------------");
+
+        for (int i = 0; i < moedas.Count; i++)
+        {
+            Console.WriteLine($"{i}- {moedas[i].Nome} {moedas[i].Cotacao}\n");
+            Console.WriteLine("---------------------\n");
+        }
+    }
 }
 
 void AdicionarMoedas()
 {
-    bool moedaOk = false;
-    while (moedaOk != true) // ! nao precisa fazer verificacao se ta usando bool...
+    Console.Clear();
+    bool adicao = false;
+    while (!adicao)
     {
-        Console.Clear();
-        Console.WriteLine("=== MENU DE ADIÇÃO DE MOEDAS ===\n");
+        Console.WriteLine("### ADIÇÃO DE MOEDAS ###\n");
 
-        Console.Write("Digite o nome da nova Moeda: ");
+        Console.Write("Digite o nome da moeda com o símbolo [Nome($)]: ");
         string novoNome = Console.ReadLine();
 
-        Console.Write("\nDigite uma Cotação para a Moeda: ");
-        if (!decimal.TryParse(Console.ReadLine(), out decimal novaCotacao) || novaCotacao <= 0) // * string a = ""; string.Empty OUTRA FORMA DE FAZER A MESMA COISA
+        Console.Write("\nDigite a cotação da moeda: ");
+        if (!decimal.TryParse(Console.ReadLine(), out decimal novaCotacao) || novaCotacao <= 0)
         {
-            Console.WriteLine("\nValor inválido!");
+            Console.Clear();
+            Console.WriteLine("Valor inválido!\n");
             Console.ReadKey();
         }
         else
         {
             moedas.Add(new Moeda() { Nome = novoNome, Cotacao = novaCotacao });
+            adicao = true;
             Console.Clear();
-            moedaOk = true;
-            Console.WriteLine("Moeda adicionada com sucesso!\n");
-            Console.WriteLine("Digite qualquer tecla para retornar ao Menu...");
-            break;
+            Console.WriteLine("Moeda Adicionada com Sucesso!\n\nTecle algo para retornar ao Menu...");
         }
     }
 }
 
 void ConverterMoedas()
 {
-    bool moedaOk = false;
-    while (moedaOk != true)// ? entender o que se passa aqui, para melhorar a capacidade de codificarkkkkkkkkkk
+    Console.Clear();
+
+    if (moedas.Count == 0)
     {
-        Console.Clear();
+        ListarMoedas();
+    }
+    else if (moedas.Count == 1)
+    {
+        ListarMoedas();
+        Console.WriteLine("É necessário ao menos 2 moedas cadastradas para uma Conversão!");
+    }
+    else
+    {
+        ListarMoedas();
 
-        // ? se tem uma função que faz exatamente isso nao tem sentido fazer um novo trecho de codigo que faz exatemente a mesma coisa
-        for (int i = 0; i < moedas.Count; i++)
+        bool conversao = false;
+        while (!conversao)
         {
-            Console.WriteLine($"{i}- {moedas[i].Nome} {moedas[i].Cotacao}\n");
-        }
+            Console.Write("Digite o Número da Moeda inicial: ");
+            if (!int.TryParse(Console.ReadLine(), out int inicial) || inicial > moedas.Count || inicial < 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Valor Inválido!\n");
+                continue;
+            }
 
-        Console.Write("Digite o Nº da opção da moeda Inicial: ");
+            Console.Write("\nDigite o Número da Moeda Final: ");
+            if (!int.TryParse(Console.ReadLine(), out int final) || final > moedas.Count || final < 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Valor inválido!\n");
+                continue;
+            }
 
-        // ! essa verificacao está toda errada nao verifica nada...
-        // if (int.TryParse(Console.ReadLine(), out int inicial) && inicial < moedas.Count && inicial >= 0)
-        // {
-        //     Console.WriteLine("");
-        // }
-        // else
-        // {
-        //     Console.WriteLine("Opção inválida!\nDigite qualquer tecla para tentar novamente...");
-        // }
-        // ! errado tambem...
-        // Console.Write("Digite o Nº da opção da moeda Final: ");
-        // if (int.TryParse(Console.ReadLine(), out int final) && final < moedas.Count && final >= 0)
-        // {
-        //     Console.WriteLine("");
-        // }
-        // else
-        // {
-        //     Console.WriteLine("Opção inválida!\nDigite qualquer tecla para tentar novamente...");
-        // }
-
-        Console.Write("Digite o valor que deseja converter: ");
-        if (valor == 0) // ! nao pode ser <= 0 // Corrigir essa verificação!
-        {
-            Console.WriteLine("Valor inválido!");
-        }
-        else
-        {
-            decimal valorConvertido = valor * moedas[inicial].Cotacao / moedas[final].Cotacao;
-            Console.WriteLine($"O valor convertido é {valorConvertido:f3} {moedas[final].Nome}");
-            moedaOk = true;
-            break;
+            Console.Write("\nDigite o Valor para Converter: ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal valor) || valor <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Valor inválido!\n");
+                continue;
+            }
+            else
+            {
+                decimal valorConvertido = valor * moedas[inicial].Cotacao / moedas[final].Cotacao;
+                Console.WriteLine($"\nO valor convertido é {valorConvertido:f2} {moedas[final].Nome}");
+                conversao = true;
+                Console.WriteLine("\nTecle qualquer tecla para retornar ao Menu...");
+            }
         }
     }
 }
 
-//
-// bool certo_errado;
-// int valor_retorno;
-// certo_errado = int.TryParse(Console.ReadLine(), out valor_retorno);
-
-// Console.WriteLine($"retorno do TRYPARSE {certo_errado} - valor do TRYPARSE {valor_retorno}");
-
-// if (valor_retorno == 0)// eu nao quero
-// {
-//     Console.WriteLine("valor invalido");
-//     return;
-// }
